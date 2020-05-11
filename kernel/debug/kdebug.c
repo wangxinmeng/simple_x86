@@ -53,7 +53,13 @@ void dump_stack(void)
 {
     uint64_t rbp = read_rbp();
     uint64_t rip = read_rip();
-    int i, j;
+    int i;
+    uint64_t args[6];
+    read_args(args);
+    printk("args:\n");
+    printk("    arg1(rdi): 0x%016lx, arg2(rsi): 0x%016lx\n", args[0], args[1]);
+    printk("    arg3(rdx): 0x%016lx, arg4(rcx): 0x%016lx\n", args[2], args[3]);
+    printk("    arg5(r8) : 0x%016lx, arg6(r9) : 0x%016lx\n", args[4], args[5]);
     for (i = 0; (rbp != root_bp && rip != 0) && i < STACK_MAX_DEPTH; i++)
     {
         printk("rbp: 0x%016lx, rip:0x%016lx\n", rbp, rip);

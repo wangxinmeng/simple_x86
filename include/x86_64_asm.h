@@ -145,4 +145,16 @@ static inline uint64_t read_rbp(void) {
     return rbp;
 }
 
+static inline void read_args(uint64_t *arg)
+{
+    asm volatile("movq %%rdi, (%%rbx)\n\r"
+                "movq %%rsi, 8(%%rbx)\n\r"
+                "movq %%rdx, 16(%%rbx)\n\r"
+                "movq %%rcx, 24(%%rbx)\n\r"
+                "movq %%r8, 32(%%rbx)\n\r"
+                "movq %%r9, 40(%%rbx)\n\r"
+                : : "b" (arg)
+                : "memory");
+}
+
 #endif

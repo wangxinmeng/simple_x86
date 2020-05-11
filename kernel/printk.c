@@ -14,12 +14,17 @@ typedef union tagwidth
 
 static char tempbuf[PRINTK_BUF_MAX] = {0};
 
-static uint8_t get_num_width(long long int num, int base)
+static uint8_t get_num_width(long long int num, int issigned, int base)
 {
     uint8_t i = 0;
+    uint64_t tempnum = *(uint64_t *)&num;
+    if (issigned && num < 0)
+    {
+        tempnum = 0 - num;
+    }
     do{
         i ++;
-    }while((num /= base) != 0);
+    }while((tempnum /= base) != 0);
     
     return i;
 }
@@ -27,7 +32,7 @@ static char *ntostring(long long int num, int issigned, int base, char *str)
 {
     char stack[21] = {0};
     int i = 0, val = 0, offset = 0;
-    uint64_t tempnum = *(uint64_t *)(int64_t *)&num;
+    uint64_t tempnum = *(uint64_t *)&num;
     if (issigned && num < 0)
     {
         tempnum = (uint64_t)(0 - num);
@@ -141,7 +146,7 @@ int vprintk(char *buf, const char *fmt, va_list args)
                     base = 10;
                     issigned = 1;
                 }
-                width.un.selfwidth = get_num_width(num, base);
+                width.un.selfwidth = get_num_width(num, issigned, base);
                 while (width.un.reqwidth-- > width.un.selfwidth)
                 {
                     *str ++ = width.un.pad;
