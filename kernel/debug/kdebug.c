@@ -4,6 +4,48 @@
 #include <head_asm.h>
 #include <x86_64_asm.h>
 
+uint64_t root_bp = 0;
+uint64_t temp_regs[MAX_REGS] = {0};
+const char *regs_string[MAX_REGS] = {
+    "RIP",
+    "RAX",
+    "RBX",
+    "RCX",
+    "RDX",
+    "RSI",
+    "RDI",
+    "RBP",
+    "RSP",
+    "R8 ",
+    "R9 ",
+    "R10",
+    "R11",
+    "R12",
+    "R13",
+    "R14",
+    "R15"
+};
+
+void dump_regs(void)
+{
+    int i = 0;
+    printk("dump_stack, regs:\n");
+    printk("    %s: 0x%016lx\n", regs_string[0],   temp_regs[0]);
+    for (i = 1; i < MAX_REGS; i += 2)
+    {
+        printk("    %s: 0x%016lx,  %s: 0x%016lx\n",
+            regs_string[i],   temp_regs[i], 
+            regs_string[i+1], temp_regs[i+1]);
+    }
+    printk("  Arg1 -> %s, Arg2 -> %s, Arg3 -> %s, Arg4 -> %s\n",
+        regs_string[REG_ARG1], regs_string[REG_ARG2], 
+        regs_string[REG_ARG3], regs_string[REG_ARG4]);
+    printk("  Arg5 -> %s, Arg6 -> %s, LR   -> %s\n",
+        regs_string[REG_ARG5], regs_string[REG_ARG6], 
+        regs_string[REG_LR]);
+    return;
+}
+
 
 void print_kernel_info(void)
 {
@@ -31,7 +73,6 @@ void print_kernel_info(void)
 }
 
 
-uint64_t root_bp;
 void set_root_bp(uint64_t bp)
 {
     root_bp = bp;
@@ -42,32 +83,6 @@ void print_debuginfo(uint64_t rip)
     
 }
 
-static __noinline uint64_t read_rip(void)
-{
-    uint64_t rip;
-    asm volatile("movq 8(%%rbp), %0" : "=r" (rip));
-    return rip;
-}
-
-void dump_stack(void)
-{
-    uint64_t rbp = read_rbp();
-    uint64_t rip = read_rip();
-    int i;
-    uint64_t args[6];
-    read_args(args);
-    printk("args:\n");
-    printk("    arg1(rdi): 0x%016lx, arg2(rsi): 0x%016lx\n", args[0], args[1]);
-    printk("    arg3(rdx): 0x%016lx, arg4(rcx): 0x%016lx\n", args[2], args[3]);
-    printk("    arg5(r8) : 0x%016lx, arg6(r9) : 0x%016lx\n", args[4], args[5]);
-    for (i = 0; (rbp != root_bp && rip != 0) && i < STACK_MAX_DEPTH; i++)
-    {
-        printk("rbp: 0x%016lx, rip:0x%016lx\n", rbp, rip);
-        print_debuginfo(rip - 1);
-        rip = ((uint64_t *)rbp)[1];
-        rbp = ((uint64_t *)rbp)[0];
-    }
-}
 
 void backtrace_init(void)
 {

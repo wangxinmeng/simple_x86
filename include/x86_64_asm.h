@@ -145,6 +145,31 @@ static inline uint64_t read_rbp(void) {
     return rbp;
 }
 
+static inline void save_regs(uint64_t *arg)
+{
+    asm volatile(
+                "movq %%rax, 8(%%rbx)\n\r"
+                "leaq (%%rip), %%rax\n\r"
+                "movq %%rax, (%%rbx)\n\r"
+                "movq %%rbx, 16(%%rbx)\n\r"
+                "movq %%rcx, 24(%%rbx)\n\r"
+                "movq %%rdx, 32(%%rbx)\n\r"
+                "movq %%rsi, 40(%%rbx)\n\r"
+                "movq %%rdi, 48(%%rbx)\n\r"
+                "movq %%rbp, 56(%%rbx)\n\r"
+                "movq %%rsp, 64(%%rbx)\n\r"
+                "movq %%r8,  72(%%rbx)\n\r"
+                "movq %%r9,  80(%%rbx)\n\r"
+                "movq %%r10, 88(%%rbx)\n\r"
+                "movq %%r11, 96(%%rbx)\n\r"
+                "movq %%r12, 104(%%rbx)\n\r"
+                "movq %%r13, 112(%%rbx)\n\r"
+                "movq %%r14, 120(%%rbx)\n\r"
+                "movq %%r15, 128(%%rbx)\n\r"
+                : : "b" (arg)
+                : "memory");
+}
+
 static inline void read_args(uint64_t *arg)
 {
     asm volatile("movq %%rdi, (%%rbx)\n\r"
