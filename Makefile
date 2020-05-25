@@ -24,7 +24,12 @@ all: bootblock loaderblock kernelblock
 	dd if=bin/bootblock of=ucore.img conv=notrunc
 	dd if=bin/loaderblock of=ucore.img seek=$(LOADER_SECTOR) conv=notrunc
 	dd if=bin/kernelblock of=ucore.img seek=$(KERNEL_SECTOR) conv=notrunc
-	./run.sh
+
+run:
+	./run.sh 
+
+debug:
+	./debug.sh
 
 # bootloader +++++++++++++++++++++++++++++++++++++++++
 bootblock:  tools

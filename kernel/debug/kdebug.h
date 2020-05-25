@@ -37,13 +37,22 @@ typedef enum {
 #define REG_ARG6  R9 
 #define REG_LR    RAX
 
+typedef struct {
+    const char *func_name;
+    const char *func_file;
+    int func_name_len;
+    int func_line;
+    uint64_t func_addr;
+    uint64_t func_off;
+}stab_func_info_s;
+
 extern const char *regs_string[MAX_REGS];
 extern uint64_t temp_regs[MAX_REGS];
 extern uint64_t root_bp;
 
 void print_kernel_info(void);
 void backtrace_init(void);
-void print_debuginfo(uint64_t rip);
+int get_kfunc_loc(uint64_t addr, stab_func_info_s *info);
 void dump_regs(void);
 
 static __noinline uint64_t read_rip(void)
@@ -62,8 +71,13 @@ static inline void dump_stack(void)
     int i;
     for (i = 0; (rbp != root_bp && rip != 0) && i < STACK_MAX_DEPTH; i++)
     {
+        stab_func_info_s info = {0};
         printk("rbp: 0x%016lx, rip:0x%016lx\n", rbp, rip);
-        print_debuginfo(rip - 1);
+        if (0 == get_kfunc_loc(rip - 1, &info))
+        {
+            printk("\t%s[%s][%d] func 0x%016lx\n", info.func_file, info.func_name, 
+                info.func_line, info.func_addr);
+        }
         rip = ((uint64_t *)rbp)[1];
         rbp = ((uint64_t *)rbp)[0];
     }

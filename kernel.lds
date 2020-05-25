@@ -6,57 +6,56 @@ SECTIONS
 {
     . = 0xffff800000000000 + 0x100000;
     //. = 0x100000;
-    .text :
-    {
-        _text = .;
-        *(.text)
-        _etext = .;
+    _text = .;
+    .text : {
+        *(.text .stub .text.* .gnu.linkonce.t.*)
     }
-    __etext = .;
+    _etext = .;
 
-    . = ALIGN(8);
+    _rodata = .;
+    .rodata : {
+        *(.rodata .rodata.* .gnu.linkonce.r.*)
+    }
+    _erodata = .;
 
+    _stab = .;
+    /* Include debugging information in kernel memory */
+    PROVIDE(__STAB_BEGIN__ = .);
+    .stab : {
+        *(.stab);
+        BYTE(0)     /* Force the linker to allocate space
+                   for this section */
+    }
+    PROVIDE(__STAB_END__ = .);
+
+    PROVIDE(__STABSTR_BEGIN__ = .);
+    .stabstr : {
+        *(.stabstr);
+        BYTE(0)     /* Force the linker to allocate space
+                   for this section */
+    }
+    PROVIDE(__STABSTR_END__ = .);
+    _estab = .;
+    
+    . = ALIGN(0x1000);
+    _data = .;
     .data :
     {
-        _data = .;
         *(.data)
-        _edata = .;
     }
-	__edata = .;
-    .rodata : 
-    {
-        _rodata = .;
-        *(.rodata)
-        _erodata = .;
+    
+    . = ALIGN(0x1000);
+    .data.pgdir : {
+        *(.data.pgdir)
     }
-	__erodata = .;
+    _edata = .;
 	
-    /* Include debugging information in kernel memory */
-    .stab : {
-        PROVIDE(__STAB_BEGIN__ = .);
-        *(.stab);
-        PROVIDE(__STAB_END__ = .);
-        BYTE(0)     /* Force the linker to allocate space
-                   for this section */
-    }
-
-    .stabstr : {
-        PROVIDE(__STABSTR_BEGIN__ = .);
-        *(.stabstr);
-        PROVIDE(__STABSTR_END__ = .);
-        BYTE(0)     /* Force the linker to allocate space
-                   for this section */
-    }
-    . = ALIGN(32768);
-    .data.init_task : { *(.data.init_task) }
-	__sbss = .;
+	_bss = .;
     .bss :
     {
-        _bss = .;
         *(.bss)
-        _ebss = .;
     }
-	__ebss = .;
+	_ebss = .;
     _end = .;
 }
 

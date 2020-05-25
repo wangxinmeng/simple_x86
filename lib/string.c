@@ -43,6 +43,16 @@ int strncmp(const char *s1, const char *s2, size_t len)
     }
     return (int)((uint8_t)*s1 - (uint8_t)*s2);
 }
+char * strfind(const char *s, char c) 
+{
+    while (*s != '\0') {
+        if (*s == c) {
+            break;
+        }
+        s ++;
+    }
+    return (char *)s;
+}
 
 void *memset(void *s, char c, size_t len)
 {

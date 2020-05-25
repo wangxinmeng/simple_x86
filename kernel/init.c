@@ -8,8 +8,8 @@
 __noreturn int start_kernel(void)
 {
     //0. 将bss段区间置0
-    extern char __sbss[], __ebss[];
-    memset(__sbss, 0, __ebss - __sbss);
+    extern char _bss[], _ebss[];
+    memset(_bss, 0, _ebss - _bss);
     
     //1. 初始化串口
     console_init();
