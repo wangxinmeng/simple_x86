@@ -69,14 +69,14 @@ static inline void dump_stack(void)
     uint64_t rbp = read_rbp();
     uint64_t rip = read_rip();
     int i;
+    printk("Calltrace:\n");
     for (i = 0; (rbp != root_bp && rip != 0) && i < STACK_MAX_DEPTH; i++)
     {
         stab_func_info_s info = {0};
-        printk("rbp: 0x%016lx, rip:0x%016lx\n", rbp, rip);
+        printk("func:0x%016lx\n", rip);
         if (0 == get_kfunc_loc(rip - 1, &info))
         {
-            printk("\t%s[%s][%d] func 0x%016lx\n", info.func_file, info.func_name, 
-                info.func_line, info.func_addr);
+            printk("\t0x%016lx, %s\n", info.func_addr, info.func_name);
         }
         rip = ((uint64_t *)rbp)[1];
         rbp = ((uint64_t *)rbp)[0];

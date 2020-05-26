@@ -150,7 +150,7 @@ int get_kfunc_loc(uint64_t addr, stab_func_info_s *info)
         printk("[%s][%d]para error!\r\n", __FUNCTION__, __LINE__);
         return -1;
     }
-
+#if 0
     // Now we find the right stabs that define the function containing
     // 'eip'.  First, we find the basic source file containing 'eip'.
     // Then, we look in that source file for the function.  Then we look
@@ -215,7 +215,25 @@ int get_kfunc_loc(uint64_t addr, stab_func_info_s *info)
     if (lline >= lfile && stabs[lline].n_strx < stabstr_end - stabstr) {
         info->func_file = stabstr + stabs[lline].n_strx;
     }
+#else
+    int lfun = 0, rfun = (stab_end - stabs) - 1;
+    stab_binsearch(stabs, &lfun, &rfun, N_FUN, addr);
 
+    if (lfun <= rfun) {
+        // stabs[lfun] points to the function name
+        // in the string table, but check bounds just in case.
+        if (stabs[lfun].n_strx < stabstr_end - stabstr) {
+            info->func_name = stabstr + stabs[lfun].n_strx;
+        }
+        info->func_addr = stabs[lfun].n_value;
+        addr -= info->func_addr;
+    } else {
+        // Couldn't find function stab!  Maybe we're in an assembly
+        // file.  Search the whole file for the line number.
+        info->func_addr = addr;
+    }
+    info->func_name_len = strfind(info->func_name, ':') - info->func_name;
+#endif
     return 0;
 
 }

@@ -3,8 +3,9 @@ BOOT_CFLAGS	:= -Iinclude -fno-builtin -Wall -ggdb -m64 -gstabs -nostdinc -Os #-f
 BOOT_LDFLAGS := -m elf_x86_64 -nostdlib -N
 
 #KERNEL_CFLAGS := -Iinclude -mcmodel=large -fno-builtin -Wall -ggdb -m64 -gstabs -nostdinc -fno-stack-protector
-KERNEL_CFLAGS := -mcmodel=large -fno-builtin -m64 -Wall -ggdb -nostdinc -fno-stack-protector
-KERNEL_LDFLAGS := -b elf64-x86-64 -z muldefs -m elf_x86_64 -nostdlib -N
+KERNEL_CFLAGS := -mcmodel=large -fno-builtin -m64 -Wall -ggdb -gstabs -nostdinc -fno-stack-protector -fno-pie
+KERNEL_LDFLAGS := -b elf64-x86-64 -z muldefs -m elf_x86_64 -nostdlib -N -pie
+
 
 HOST_CFLAGS := -Itools/ -g -Wall -O2
 
