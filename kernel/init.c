@@ -5,6 +5,12 @@
 #include <cpu.h>
 #include <kdebug.h>
 
+void test_dump(int64_t p1, int64_t p2, int64_t p3, 
+                    int64_t p4, int64_t p5, int64_t p6)
+{
+    dump_stack();
+}
+
 __noreturn int start_kernel(void)
 {
     //0. 将bss段区间置0
@@ -22,7 +28,9 @@ __noreturn int start_kernel(void)
     
     //4. 调用栈功能初始化，便于定位后续问题
     backtrace_init();
-    
+    test_dump(1, 2, 3, 4, 5, 6);
+    test_dump(0x11, 0x12, 0x13, 0x14, 0x15, 0x16);
+    test_dump(0x21, 0x22, 0x23, 0x24, 0x25, 0x26);
 #if 0
     //5. 初始化中断描述符表
     idt_pre_init();

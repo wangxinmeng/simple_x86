@@ -242,7 +242,7 @@ int get_kfunc_loc(uint64_t addr, stab_func_info_s *info)
 void backtrace_init(void)
 {
     set_root_bp(KERNEL_BP_ADDR + KERNEL_VIR_START);
-    dump_stack();
+    //dump_stack();
 }
 
 
